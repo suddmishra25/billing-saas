@@ -2,34 +2,47 @@ package in.sudhanshu.Billingsoftware.service.impl;
 
 import in.sudhanshu.Billingsoftware.dto.InvoiceItemRequest;
 import in.sudhanshu.Billingsoftware.dto.InvoiceItemResponse;
+import in.sudhanshu.Billingsoftware.dto.InvoicePaymentUpdateRequest;
 import in.sudhanshu.Billingsoftware.dto.InvoiceRequest;
 import in.sudhanshu.Billingsoftware.dto.InvoiceResponse;
-import in.sudhanshu.Billingsoftware.entity.CustomerEntity;
+import in.sudhanshu.Billingsoftware.dto.InvoiceSalesReportResponse;
+import in.sudhanshu.Billingsoftware.dto.TenantBrandingResponse;
+import in.sudhanshu.Billingsoftware.entity.ClientEntity;
 import in.sudhanshu.Billingsoftware.entity.InvoiceEntity;
 import in.sudhanshu.Billingsoftware.entity.InvoiceItemEntity;
 import in.sudhanshu.Billingsoftware.entity.ItemEntity;
 import in.sudhanshu.Billingsoftware.entity.TenantEntity;
-import in.sudhanshu.Billingsoftware.repository.CustomerRepository;
+import in.sudhanshu.Billingsoftware.repository.ClientRepository;
 import in.sudhanshu.Billingsoftware.repository.InvoiceRepository;
 import in.sudhanshu.Billingsoftware.repository.ItemRepository;
 import in.sudhanshu.Billingsoftware.repository.TenantRepository;
 import in.sudhanshu.Billingsoftware.service.InvoiceNumberService;
 import in.sudhanshu.Billingsoftware.service.InvoiceService;
+import in.sudhanshu.Billingsoftware.io.DashboardResponse;
+import in.sudhanshu.Billingsoftware.util.FinancialYearUtil;
 import in.sudhanshu.Billingsoftware.util.TenantContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 @Service
 @RequiredArgsConstructor
 public class InvoiceServiceImpl implements InvoiceService {
 
     private final TenantRepository tenantRepository;
-    private final CustomerRepository customerRepository;
+    private final ClientRepository clientRepository;
     private final ItemRepository itemRepository;
     private final InvoiceRepository invoiceRepository;
     private final InvoiceNumberService invoiceNumberService;
@@ -54,16 +67,16 @@ public class InvoiceServiceImpl implements InvoiceService {
                 );
 
         // =====================================================
-        // 2. Get customer belonging to this tenant
+        // 2. Get client belonging to this tenant
         // =====================================================
 
-        CustomerEntity customer =
-                customerRepository.findByCustomerIdAndTenantId(
-                        request.getCustomerId(),
+        ClientEntity client =
+                clientRepository.findByClientIdAndTenantId(
+                        request.getClientId(),
                         tenantId
                 ).orElseThrow(() ->
                         new RuntimeException(
-                                "Customer not found for this tenant"
+                                "Client not found for this tenant"
                         )
                 );
 
@@ -74,7 +87,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         InvoiceEntity invoice = new InvoiceEntity();
 
         invoice.setTenant(tenant);
-        invoice.setCustomer(customer);
+        invoice.setClient(client);
 
         //invoice.setInvoiceNumber(request.getInvoiceNumber());
         // Generate invoice number
@@ -100,6 +113,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setEWayBillNumber(request.getEWayBillNumber());
         invoice.setPurchaseOrderNumber(request.getPurchaseOrderNumber());
         invoice.setReferenceNumber(request.getReferenceNumber());
+        invoice.setChallanNumber(request.getChallanNumber());
+        invoice.setChallanDated(request.getChallanDated());
         invoice.setNotes(request.getNotes());
 
         // =====================================================
@@ -110,6 +125,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setSellerEmail(tenant.getEmail());
         invoice.setSellerPhone(tenant.getPhoneNumber());
         invoice.setSellerAddress(tenant.getAddress());
+        invoice.setSellerCity(tenant.getCity());
+        invoice.setSellerState(tenant.getState());
+        invoice.setSellerPincode(tenant.getPincode());
+        invoice.setSellerGstin(tenant.getGstin());
 
         // =====================================================
         // 5. Create invoice items
@@ -122,7 +141,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                                 createInvoiceItem(
                                         itemRequest,
                                         tenantId,
-                                        customer.getId(),
+                                        client.getId(),
                                         tenant
                                 )
                         )
@@ -156,29 +175,89 @@ public class InvoiceServiceImpl implements InvoiceService {
         return convertToResponse(savedInvoice);
     }
 
+    @Override
+    @Transactional
+    public InvoiceResponse updateInvoice(String invoiceId, InvoiceRequest request) {
+
+        Long tenantId = TenantContext.getTenantId();
+        if (tenantId == null) {
+            throw new RuntimeException("Tenant not found");
+        }
+
+        TenantEntity tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new RuntimeException("Tenant not found"));
+
+        InvoiceEntity invoice = invoiceRepository
+                .findByInvoiceIdAndTenantId(invoiceId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        if (request.getClientId() == null || request.getClientId().isBlank()) {
+            throw new RuntimeException("Client is required");
+        }
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new RuntimeException("At least one line item is required");
+        }
+
+        ClientEntity client = clientRepository
+                .findByClientIdAndTenantId(request.getClientId(), tenantId)
+                .orElseThrow(() -> new RuntimeException("Client not found for this tenant"));
+
+        invoice.setClient(client);
+        invoice.setInvoiceDate(request.getInvoiceDate());
+        invoice.setDueDate(request.getDueDate());
+        invoice.setPaymentMethod(request.getPaymentMethod());
+        invoice.setAmountPaid(
+                request.getAmountPaid() != null
+                        ? request.getAmountPaid()
+                        : BigDecimal.ZERO
+        );
+        invoice.setPlaceOfSupply(request.getPlaceOfSupply());
+        invoice.setVehicleNumber(request.getVehicleNumber());
+        invoice.setTransportName(request.getTransportName());
+        invoice.setEWayBillNumber(request.getEWayBillNumber());
+        invoice.setPurchaseOrderNumber(request.getPurchaseOrderNumber());
+        invoice.setReferenceNumber(request.getReferenceNumber());
+        invoice.setChallanNumber(request.getChallanNumber());
+        invoice.setChallanDated(request.getChallanDated());
+        invoice.setNotes(request.getNotes());
+
+        List<InvoiceItemEntity> invoiceItems = request.getItems()
+                .stream()
+                .map(itemRequest ->
+                        createInvoiceItem(
+                                itemRequest,
+                                tenantId,
+                                client.getId(),
+                                tenant
+                        )
+                )
+                .toList();
+
+        invoice.getItems().clear();
+        invoice.getItems().addAll(invoiceItems);
+
+        calculateInvoiceTotals(invoice);
+        updatePaymentStatus(invoice);
+
+        return convertToResponse(invoiceRepository.save(invoice));
+    }
 
     private InvoiceItemEntity createInvoiceItem(
             InvoiceItemRequest request,
             Long tenantId,
-            Long customerId,
+            Long clientPkId,
             TenantEntity tenant) {
-
-        // =====================================================
-        // Find item belonging to:
-        //
-        // tenant + customer
-        // =====================================================
 
         ItemEntity item =
                 itemRepository
-                        .findByItemIdAndTenantIdAndCustomerId(
+                        .findByItemIdAndTenantIdAndClientId(
                                 request.getItemId(),
                                 tenantId,
-                                customerId
+                                clientPkId
                         )
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                        "Item not found for this customer"
+                                        "Item not found for this client"
                                 )
                         );
 
@@ -253,19 +332,21 @@ public class InvoiceServiceImpl implements InvoiceService {
         // GST
         // =====================================================
 
-        BigDecimal gstRate =
-                item.getGstRate() != null
-                        ? item.getGstRate()
-                        : BigDecimal.ZERO;
+        BigDecimal cgstRate = ItemServiceImpl.effectiveCgst(item);
+        BigDecimal sgstRate = ItemServiceImpl.effectiveSgst(item);
 
-        BigDecimal taxAmount =
+        BigDecimal cgstAmount =
                 taxableAmount
-                        .multiply(gstRate)
-                        .divide(
-                                BigDecimal.valueOf(100),
-                                2,
-                                RoundingMode.HALF_UP
-                        );
+                        .multiply(cgstRate)
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        BigDecimal sgstAmount =
+                taxableAmount
+                        .multiply(sgstRate)
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        BigDecimal taxAmount = cgstAmount.add(sgstAmount);
+        BigDecimal gstRate = cgstRate.add(sgstRate);
 
         // =====================================================
         // Total
@@ -290,6 +371,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .discount(discount)
                 .taxableAmount(taxableAmount)
                 .gstRate(gstRate)
+                .cgstRate(cgstRate)
+                .sgstRate(sgstRate)
                 .totalTax(taxAmount)
                 .totalAmount(totalAmount)
                 .build();
@@ -303,6 +386,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal totalDiscount = BigDecimal.ZERO;
         BigDecimal taxableAmount = BigDecimal.ZERO;
         BigDecimal totalTax = BigDecimal.ZERO;
+        BigDecimal totalCgst = BigDecimal.ZERO;
+        BigDecimal totalSgst = BigDecimal.ZERO;
 
         for (InvoiceItemEntity item : invoice.getItems()) {
 
@@ -322,10 +407,32 @@ public class InvoiceServiceImpl implements InvoiceService {
                             item.getTaxableAmount()
                     );
 
-            totalTax =
-                    totalTax.add(
-                            item.getTotalTax()
-                    );
+            BigDecimal lineCgstRate =
+                    item.getCgstRate() != null ? item.getCgstRate() : BigDecimal.ZERO;
+            BigDecimal lineSgstRate =
+                    item.getSgstRate() != null ? item.getSgstRate() : BigDecimal.ZERO;
+            if (lineCgstRate.compareTo(BigDecimal.ZERO) == 0
+                    && lineSgstRate.compareTo(BigDecimal.ZERO) == 0
+                    && item.getGstRate() != null) {
+                lineCgstRate = item.getGstRate()
+                        .divide(BigDecimal.valueOf(2), 2, RoundingMode.HALF_UP);
+                lineSgstRate = item.getGstRate().subtract(lineCgstRate);
+            }
+
+            BigDecimal taxable = item.getTaxableAmount() != null
+                    ? item.getTaxableAmount()
+                    : BigDecimal.ZERO;
+
+            BigDecimal lineCgst = taxable
+                    .multiply(lineCgstRate)
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            BigDecimal lineSgst = taxable
+                    .multiply(lineSgstRate)
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+            totalCgst = totalCgst.add(lineCgst);
+            totalSgst = totalSgst.add(lineSgst);
+            totalTax = totalTax.add(lineCgst).add(lineSgst);
         }
 
         BigDecimal grandTotal =
@@ -335,27 +442,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoice.setDiscount(totalDiscount);
         invoice.setTaxableAmount(taxableAmount);
         invoice.setTotalTax(totalTax);
-
-        /*
-         * For now assuming intra-state GST.
-         *
-         * Later we can calculate CGST/SGST/IGST
-         * based on seller and customer state.
-         */
-
-        invoice.setCgst(
-                totalTax.divide(
-                        BigDecimal.valueOf(2),
-                        2,
-                        RoundingMode.HALF_UP
-                )
-        );
-
-        invoice.setSgst(
-                totalTax.subtract(
-                        invoice.getCgst()
-                )
-        );
+        invoice.setCgst(totalCgst);
+        invoice.setSgst(totalSgst);
 
         invoice.setIgst(BigDecimal.ZERO);
         invoice.setCess(BigDecimal.ZERO);
@@ -438,7 +526,13 @@ public class InvoiceServiceImpl implements InvoiceService {
                                 .description(item.getDescription())
                                 .hsnCode(item.getHsnCode())
                                 .unit(item.getUnit())
+                                .quantity(item.getQuantity())
                                 .rate(item.getRate())
+                                .discount(item.getDiscount())
+                                .taxableAmount(item.getTaxableAmount())
+                                .gstRate(item.getGstRate())
+                                .cgstRate(item.getCgstRate())
+                                .sgstRate(item.getSgstRate())
                                 .totalTax(item.getTotalTax())
                                 .totalAmount(item.getTotalAmount())
                                 .build())
@@ -458,38 +552,39 @@ public class InvoiceServiceImpl implements InvoiceService {
                 // Tenant
                 // =========================
                 .tenantId(invoice.getTenant().getTenantId())
+                .branding(tenantBranding(invoice.getTenant()))
 
                 // =========================
-                // Customer
+                // Client
                 // =========================
-                .customerId(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getCustomerId()
+                .clientId(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getClientId()
                                 : null
                 )
-                .customerName(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getName()
+                .clientName(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getName()
                                 : null
                 )
-                .customerPhone(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getPhoneNumber()
+                .clientPhone(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getPhoneNumber()
                                 : null
                 )
-                .customerEmail(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getEmail()
+                .clientEmail(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getEmail()
                                 : null
                 )
-                .customerAddress(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getAddress()
+                .clientAddress(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getAddress()
                                 : null
                 )
-                .customerGst(
-                        invoice.getCustomer() != null
-                                ? invoice.getCustomer().getGstin()
+                .clientGst(
+                        invoice.getClient() != null
+                                ? invoice.getClient().getGstin()
                                 : null
                 )
 
@@ -544,6 +639,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .eWayBillNumber(invoice.getEWayBillNumber())
                 .purchaseOrderNumber(invoice.getPurchaseOrderNumber())
                 .referenceNumber(invoice.getReferenceNumber())
+                .challanNumber(invoice.getChallanNumber())
+                .challanDated(invoice.getChallanDated())
                 .notes(invoice.getNotes())
 
                 // =========================
@@ -575,5 +672,290 @@ public class InvoiceServiceImpl implements InvoiceService {
                 );
 
         return convertToResponse(invoice);
+    }
+
+    @Override
+    public List<InvoiceResponse> listInvoices() {
+
+        Long tenantId = TenantContext.getTenantId();
+
+        if (tenantId == null) {
+            throw new RuntimeException("Tenant not found");
+        }
+
+        return invoiceRepository
+                .findByTenantIdOrderByCreatedAtDesc(tenantId)
+                .stream()
+                .map(this::convertToResponse)
+                .toList();
+    }
+
+    @Override
+    public InvoiceSalesReportResponse getSalesReport(String financialYear, String clientId) {
+        Long tenantId = TenantContext.getTenantId();
+        if (tenantId == null) {
+            throw new RuntimeException("Tenant not found");
+        }
+
+        List<InvoiceEntity> all = invoiceRepository.findByTenantIdOrderByCreatedAtDesc(tenantId);
+
+        TreeSet<String> availableYears = new TreeSet<>(Comparator.reverseOrder());
+        for (InvoiceEntity inv : all) {
+            String fy = FinancialYearUtil.financialYearFor(inv.getInvoiceDate());
+            if (fy != null) {
+                availableYears.add(fy);
+            }
+        }
+        if (availableYears.isEmpty()) {
+            availableYears.add(FinancialYearUtil.currentFinancialYear());
+        }
+
+        String selectedFy = (financialYear != null && !financialYear.isBlank())
+                ? financialYear.trim()
+                : availableYears.first();
+
+        List<InvoiceEntity> inFinancialYear = all.stream()
+                .filter(inv -> selectedFy.equals(FinancialYearUtil.financialYearFor(inv.getInvoiceDate())))
+                .toList();
+
+        String selectedClient = (clientId != null && !clientId.isBlank()) ? clientId.trim() : null;
+
+        Map<String, InvoiceSalesReportResponse.ClientSalesSummary> byClient = new LinkedHashMap<>();
+        for (InvoiceEntity inv : inFinancialYear) {
+            if (inv.getClient() == null) {
+                continue;
+            }
+            if (inv.getPaymentStatus() == InvoiceEntity.PaymentStatus.CANCELLED) {
+                continue;
+            }
+            String cid = inv.getClient().getClientId();
+            InvoiceSalesReportResponse.ClientSalesSummary row = byClient.computeIfAbsent(
+                    cid,
+                    k -> InvoiceSalesReportResponse.ClientSalesSummary.builder()
+                            .clientId(cid)
+                            .clientName(inv.getClient().getName())
+                            .invoiceCount(0)
+                            .totalSales(BigDecimal.ZERO)
+                            .totalTax(BigDecimal.ZERO)
+                            .amountReceived(BigDecimal.ZERO)
+                            .outstanding(BigDecimal.ZERO)
+                            .build()
+            );
+            row.setInvoiceCount(row.getInvoiceCount() + 1);
+            row.setTotalSales(row.getTotalSales().add(nz(inv.getGrandTotal())));
+            row.setTotalTax(row.getTotalTax().add(nz(inv.getTotalTax())));
+            row.setAmountReceived(row.getAmountReceived().add(nz(inv.getAmountPaid())));
+            row.setOutstanding(row.getOutstanding().add(nz(inv.getBalanceAmount())));
+        }
+
+        List<InvoiceSalesReportResponse.ClientSalesSummary> salesByClient = new ArrayList<>(byClient.values());
+        salesByClient.sort(Comparator.comparing(
+                InvoiceSalesReportResponse.ClientSalesSummary::getTotalSales,
+                Comparator.nullsFirst(Comparator.naturalOrder())
+        ).reversed());
+
+        List<InvoiceEntity> forTable = inFinancialYear;
+        if (selectedClient != null) {
+            forTable = inFinancialYear.stream()
+                    .filter(inv -> inv.getClient() != null && selectedClient.equals(inv.getClient().getClientId()))
+                    .toList();
+        }
+
+        int cancelledCount = 0;
+        int invoiceCount = 0;
+        BigDecimal totalSales = BigDecimal.ZERO;
+        BigDecimal totalTax = BigDecimal.ZERO;
+        BigDecimal amountReceived = BigDecimal.ZERO;
+        BigDecimal outstanding = BigDecimal.ZERO;
+
+        for (InvoiceEntity inv : forTable) {
+            if (inv.getPaymentStatus() == InvoiceEntity.PaymentStatus.CANCELLED) {
+                cancelledCount++;
+                continue;
+            }
+            invoiceCount++;
+            totalSales = totalSales.add(nz(inv.getGrandTotal()));
+            totalTax = totalTax.add(nz(inv.getTotalTax()));
+            amountReceived = amountReceived.add(nz(inv.getAmountPaid()));
+            outstanding = outstanding.add(nz(inv.getBalanceAmount()));
+        }
+
+        List<InvoiceSalesReportResponse.InvoiceSalesReportRow> rows = forTable.stream()
+                .sorted(Comparator.comparing(
+                        InvoiceEntity::getInvoiceDate,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                ))
+                .map(inv -> InvoiceSalesReportResponse.InvoiceSalesReportRow.builder()
+                        .invoiceId(inv.getInvoiceId())
+                        .invoiceNumber(inv.getInvoiceNumber())
+                        .invoiceDate(inv.getInvoiceDate())
+                        .clientId(inv.getClient() != null ? inv.getClient().getClientId() : null)
+                        .clientName(inv.getClient() != null ? inv.getClient().getName() : null)
+                        .grandTotal(inv.getGrandTotal())
+                        .totalTax(inv.getTotalTax())
+                        .paymentStatus(mapPaymentStatus(inv))
+                        .balanceAmount(inv.getBalanceAmount())
+                        .build())
+                .toList();
+
+        return InvoiceSalesReportResponse.builder()
+                .financialYear(selectedFy)
+                .clientId(selectedClient)
+                .availableFinancialYears(new ArrayList<>(availableYears))
+                .summary(InvoiceSalesReportResponse.SalesReportSummary.builder()
+                        .invoiceCount(invoiceCount)
+                        .cancelledCount(cancelledCount)
+                        .totalSales(totalSales)
+                        .totalTax(totalTax)
+                        .amountReceived(amountReceived)
+                        .outstanding(outstanding)
+                        .build())
+                .salesByClient(salesByClient)
+                .invoices(rows)
+                .build();
+    }
+
+    private static BigDecimal nz(BigDecimal value) {
+        return value != null ? value : BigDecimal.ZERO;
+    }
+
+    private static InvoiceResponse.InvoicePaymentStatus mapPaymentStatus(InvoiceEntity invoice) {
+        if (invoice.getPaymentStatus() == null) {
+            return InvoiceResponse.InvoicePaymentStatus.PENDING;
+        }
+        return InvoiceResponse.InvoicePaymentStatus.valueOf(invoice.getPaymentStatus().name());
+    }
+
+    @Override
+    @Transactional
+    public InvoiceResponse updatePayment(
+            String invoiceId,
+            InvoicePaymentUpdateRequest request) {
+
+        Long tenantId = TenantContext.getTenantId();
+        if (tenantId == null) {
+            throw new RuntimeException("Tenant not found");
+        }
+
+        InvoiceEntity invoice = invoiceRepository
+                .findByInvoiceIdAndTenantId(invoiceId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        if (request.getPaymentStatus() == InvoiceResponse.InvoicePaymentStatus.CANCELLED) {
+            invoice.setPaymentStatus(InvoiceEntity.PaymentStatus.CANCELLED);
+        } else if (request.getPaymentStatus() == InvoiceResponse.InvoicePaymentStatus.PAID) {
+            invoice.setAmountPaid(invoice.getGrandTotal());
+            invoice.setBalanceAmount(BigDecimal.ZERO);
+            invoice.setPaymentStatus(InvoiceEntity.PaymentStatus.PAID);
+        } else if (request.getPaymentStatus() == InvoiceResponse.InvoicePaymentStatus.PARTIAL) {
+            BigDecimal paid = request.getAmountPaid() != null
+                    ? request.getAmountPaid()
+                    : BigDecimal.ZERO;
+            if (paid.compareTo(BigDecimal.ZERO) <= 0
+                    || paid.compareTo(invoice.getGrandTotal()) >= 0) {
+                throw new RuntimeException(
+                        "Partial payment requires amount greater than 0 and less than grand total"
+                );
+            }
+            invoice.setAmountPaid(paid);
+            invoice.setBalanceAmount(invoice.getGrandTotal().subtract(paid));
+            invoice.setPaymentStatus(InvoiceEntity.PaymentStatus.PARTIAL);
+        } else if (request.getPaymentStatus() == InvoiceResponse.InvoicePaymentStatus.PENDING) {
+            invoice.setAmountPaid(BigDecimal.ZERO);
+            invoice.setBalanceAmount(invoice.getGrandTotal());
+            invoice.setPaymentStatus(InvoiceEntity.PaymentStatus.PENDING);
+        } else if (request.getAmountPaid() != null) {
+            invoice.setAmountPaid(request.getAmountPaid());
+            updatePaymentStatus(invoice);
+            invoice.setBalanceAmount(
+                    invoice.getGrandTotal().subtract(invoice.getAmountPaid())
+            );
+        }
+
+        return convertToResponse(invoiceRepository.save(invoice));
+    }
+
+    private TenantBrandingResponse tenantBranding(TenantEntity tenant) {
+        if (tenant == null) {
+            return null;
+        }
+        return TenantBrandingResponse.builder()
+                .tenantId(tenant.getTenantId())
+                .companyName(tenant.getCompanyName())
+                .email(tenant.getEmail())
+                .phoneNumber(tenant.getPhoneNumber())
+                .address(tenant.getAddress())
+                .city(tenant.getCity())
+                .state(tenant.getState())
+                .pincode(tenant.getPincode())
+                .gstin(tenant.getGstin())
+                .website(tenant.getWebsite())
+                .tagline(tenant.getTagline())
+                .companyNameColor(tenant.getCompanyNameColor())
+                .taglineColor(tenant.getTaglineColor())
+                .headerImageUrl(tenant.getHeaderImageUrl())
+                .headerBannerUrl(tenant.getHeaderBannerUrl())
+                .signatureImageUrl(tenant.getSignatureImageUrl())
+                .bankName(tenant.getBankName())
+                .bankAccountNumber(tenant.getBankAccountNumber())
+                .bankBranch(tenant.getBankBranch())
+                .bankIfsc(tenant.getBankIfsc())
+                .declarationText(tenant.getDeclarationText())
+                .termsAndConditions(tenant.getTermsAndConditions())
+                .build();
+    }
+
+    @Override
+    public DashboardResponse getDashboard(int page, int size) {
+
+        Long tenantId = TenantContext.getTenantId();
+
+        if (tenantId == null) {
+            throw new RuntimeException("Tenant not found");
+        }
+
+        LocalDate now = LocalDate.now();
+        LocalDate monthStart = now.withDayOfMonth(1);
+        LocalDate monthEnd = now.withDayOfMonth(now.lengthOfMonth());
+
+        BigDecimal monthTotal =
+                invoiceRepository.sumGrandTotalByTenantAndInvoiceDateBetween(
+                        tenantId,
+                        monthStart,
+                        monthEnd
+                );
+
+        if (monthTotal == null) {
+            monthTotal = BigDecimal.ZERO;
+        }
+
+        long monthCount =
+                invoiceRepository.countByTenantAndInvoiceDateBetween(
+                        tenantId,
+                        monthStart,
+                        monthEnd
+                );
+
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Page<InvoiceEntity> invoicePage =
+                invoiceRepository.findByTenantIdOrderByCreatedAtDesc(
+                        tenantId,
+                        PageRequest.of(Math.max(page, 0), safeSize)
+                );
+
+        List<InvoiceResponse> recent =
+                invoicePage.getContent()
+                        .stream()
+                        .map(this::convertToResponse)
+                        .toList();
+
+        return DashboardResponse.builder()
+                .monthSales(monthTotal.doubleValue())
+                .monthInvoiceCount(monthCount)
+                .recentInvoices(recent)
+                .currentPage(invoicePage.getNumber())
+                .totalPages(invoicePage.getTotalPages())
+                .totalElements(invoicePage.getTotalElements())
+                .build();
     }
 }

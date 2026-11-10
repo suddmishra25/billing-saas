@@ -3,7 +3,6 @@ package in.sudhanshu.Billingsoftware.io;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -14,7 +13,9 @@ public class ItemResponse {
 
     private String itemId;
 
-    private String customerId;
+    private String clientId;
+
+    private String clientName;
 
     private String name;
 
@@ -29,6 +30,10 @@ public class ItemResponse {
     private BigDecimal purchasePrice;
 
     private BigDecimal gstRate;
+
+    private BigDecimal cgstRate;
+
+    private BigDecimal sgstRate;
 
     private BigDecimal discount;
 

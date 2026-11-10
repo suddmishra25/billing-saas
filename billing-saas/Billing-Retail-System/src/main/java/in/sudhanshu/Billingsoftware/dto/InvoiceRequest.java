@@ -1,7 +1,6 @@
 package in.sudhanshu.Billingsoftware.dto;
 
 import in.sudhanshu.Billingsoftware.io.PaymentMethod;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @Setter
 public class InvoiceRequest {
 
-    private String customerId;
+    private String clientId;
 
     private LocalDate invoiceDate;
 
@@ -34,6 +33,10 @@ public class InvoiceRequest {
     private String purchaseOrderNumber;
 
     private String referenceNumber;
+
+    private String challanNumber;
+
+    private String challanDated;
 
     private String notes;
 

@@ -39,6 +39,10 @@ public class InvoiceItemEntity {
 
     private BigDecimal gstRate;
 
+    private BigDecimal cgstRate;
+
+    private BigDecimal sgstRate;
+
     private BigDecimal totalTax;
 
     private BigDecimal totalAmount;

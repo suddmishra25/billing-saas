@@ -1,0 +1,30 @@
+.invoice-branding-page {
+    min-height: 100vh;
+    padding: 1.5rem;
+    color: var(--app-text);
+}
+
+.invoice-branding-card {
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    padding: 1.5rem 1.75rem;
+    box-shadow: var(--app-shadow);
+}
+
+.invoice-branding-card h4,
+.invoice-branding-card h6 {
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.invoice-branding-preview {
+    max-height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+    background: #fff;
+    padding: 8px;
+    border-radius: 4px;
+}

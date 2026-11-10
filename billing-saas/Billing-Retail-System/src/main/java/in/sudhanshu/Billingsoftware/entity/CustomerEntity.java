@@ -43,7 +43,7 @@ public class CustomerEntity {
     private String stateCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tenant_id", nullable = false)
+    @JoinColumn(name = "tenant_id")
     private TenantEntity tenant;
 
     @CreationTimestamp

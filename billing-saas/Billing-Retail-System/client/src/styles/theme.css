@@ -1,0 +1,325 @@
+/**
+ * App theme — deep navy base, amber primary, cyan/violet accents.
+ * Loaded after Bootstrap to override defaults.
+ */
+:root {
+    --app-bg-0: #070b12;
+    --app-bg-1: #0e1524;
+    --app-bg-2: #141d30;
+    --app-surface: #1a2438;
+    --app-surface-hover: #22304a;
+    --app-surface-2: #243047;
+    --app-border: rgba(148, 163, 184, 0.14);
+    --app-border-bright: rgba(245, 158, 11, 0.35);
+
+    --app-text: #f1f5f9;
+    --app-text-muted: #94a3b8;
+    --app-text-dim: #64748b;
+
+    --app-primary: #f59e0b;
+    --app-primary-rgb: 245, 158, 11;
+    --app-primary-hover: #fbbf24;
+    --app-primary-soft: rgba(245, 158, 11, 0.12);
+
+    --app-accent: #22d3ee;
+    --app-accent-rgb: 34, 211, 238;
+    --app-accent-soft: rgba(34, 211, 238, 0.12);
+
+    --app-violet: #a78bfa;
+    --app-success: #34d399;
+    --app-danger: #fb7185;
+
+    --app-radius: 12px;
+    --app-radius-lg: 16px;
+    --app-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --app-shadow-glow: 0 0 24px rgba(var(--app-primary-rgb), 0.15);
+
+    --bs-body-bg: var(--app-bg-1);
+    --bs-body-color: var(--app-text);
+    --bs-primary: var(--app-primary);
+    --bs-warning: var(--app-primary);
+    --bs-secondary: #475569;
+    --bs-border-color: var(--app-border);
+    --bs-link-color: var(--app-accent);
+    --bs-link-hover-color: #67e8f9;
+}
+
+body {
+    background: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(34, 211, 238, 0.08), transparent 55%),
+        radial-gradient(ellipse 80% 60% at 100% 0%, rgba(167, 139, 250, 0.06), transparent 50%),
+        linear-gradient(180deg, var(--app-bg-0) 0%, var(--app-bg-1) 40%, var(--app-bg-2) 100%);
+    background-attachment: fixed;
+    color: var(--app-text);
+}
+
+.app-main {
+    padding-bottom: 1rem;
+}
+
+/* —— Nav —— */
+.app-navbar {
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(20, 29, 48, 0.92)) !important;
+    border-bottom: 1px solid var(--app-border);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.app-brand {
+    display: flex !important;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.15rem !important;
+    color: var(--app-text) !important;
+    text-decoration: none;
+}
+
+.app-brand-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--app-primary), #ea580c);
+    color: #0f172a;
+    font-size: 1.25rem;
+    box-shadow: var(--app-shadow-glow);
+}
+
+.app-brand-text {
+    letter-spacing: -0.02em;
+}
+
+.app-navbar .nav-link {
+    color: var(--app-text-muted) !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    padding: 0.5rem 0.85rem !important;
+    border-radius: 8px;
+    margin-right: 0.25rem;
+    transition: color 0.2s, background 0.2s;
+}
+
+.app-navbar .nav-link:hover {
+    color: var(--app-text) !important;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.app-navbar .nav-link.fw-bold.text-warning {
+    color: var(--app-primary) !important;
+    background: var(--app-primary-soft);
+}
+
+.app-navbar .navbar-toggler {
+    border-color: var(--app-border);
+    box-shadow: none;
+}
+
+.app-navbar .navbar-toggler:focus {
+    box-shadow: 0 0 0 2px rgba(var(--app-primary-rgb), 0.35);
+}
+
+.nav-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    color: var(--app-accent);
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.app-navbar .dropdown-menu {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    box-shadow: var(--app-shadow);
+    border-radius: var(--app-radius);
+}
+
+.app-navbar .dropdown-item {
+    color: var(--app-text);
+}
+
+.app-navbar .dropdown-item:hover {
+    background: var(--app-surface-hover);
+    color: var(--app-primary);
+}
+
+/* —— Buttons —— */
+.btn-warning {
+    --bs-btn-bg: linear-gradient(135deg, #fbbf24, #f59e0b);
+    --bs-btn-border-color: #d97706;
+    --bs-btn-color: #0f172a;
+    --bs-btn-hover-bg: #fcd34d;
+    --bs-btn-hover-border-color: #f59e0b;
+    --bs-btn-hover-color: #0f172a;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b) !important;
+    border: none !important;
+    font-weight: 600;
+    box-shadow: 0 2px 12px rgba(var(--app-primary-rgb), 0.35);
+}
+
+.btn-warning:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 4px 16px rgba(var(--app-primary-rgb), 0.45);
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+    --bs-btn-bg: var(--app-surface-2);
+    --bs-btn-border-color: var(--app-border);
+    --bs-btn-color: var(--app-text);
+    background: var(--app-surface-2) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+.btn-outline-warning {
+    border-color: var(--app-primary) !important;
+    color: var(--app-primary) !important;
+}
+
+.btn-outline-warning:hover {
+    background: var(--app-primary-soft) !important;
+    color: var(--app-primary-hover) !important;
+}
+
+/* —— Forms —— */
+.form-control,
+.form-select {
+    background-color: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+    border-radius: 10px !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: rgba(var(--app-accent-rgb), 0.5) !important;
+    box-shadow: 0 0 0 3px rgba(var(--app-accent-rgb), 0.15) !important;
+}
+
+.form-control::placeholder {
+    color: var(--app-text-dim);
+}
+
+.form-label {
+    color: var(--app-text-muted);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* —— Cards & surfaces —— */
+.card {
+    border-radius: var(--app-radius-lg) !important;
+    border: 1px solid var(--app-border) !important;
+}
+
+.card.bg-dark,
+.bg-dark.card {
+    background: var(--app-surface) !important;
+}
+
+.border-secondary {
+    border-color: var(--app-border) !important;
+}
+
+.list-group-item-dark {
+    background: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text);
+}
+
+/* —— Tables —— */
+.table-dark {
+    --bs-table-bg: var(--app-surface);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-hover-bg: var(--app-surface-hover);
+    --bs-table-border-color: var(--app-border);
+}
+
+/* —— Page shells (shared) —— */
+.page-shell {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 1.5rem 2rem;
+}
+
+.page-header {
+    margin-bottom: 1.25rem;
+}
+
+.page-header h2,
+.page-title {
+    color: var(--app-primary);
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.page-subtitle {
+    color: var(--app-text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.surface-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--app-shadow);
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--app-accent-soft);
+    color: var(--app-accent);
+}
+
+.text-warning {
+    color: var(--app-primary) !important;
+}
+
+.badge.bg-warning {
+    background: var(--app-primary) !important;
+    color: #0f172a !important;
+}
+
+.badge.bg-secondary {
+    background: var(--app-surface-2) !important;
+    color: var(--app-text-muted) !important;
+    border: 1px solid var(--app-border);
+}
+
+.item-card {
+    border: 1px solid var(--app-border) !important;
+    background: var(--app-surface) !important;
+    border-radius: var(--app-radius) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.item-card.border-warning {
+    border-color: var(--app-primary) !important;
+    box-shadow: var(--app-shadow-glow);
+}
+
+.category-list-container .form-select,
+.category-list-container .form-control {
+    background: var(--app-surface) !important;
+}
+
+/* Login / auth pages keep their local CSS but benefit from form vars */

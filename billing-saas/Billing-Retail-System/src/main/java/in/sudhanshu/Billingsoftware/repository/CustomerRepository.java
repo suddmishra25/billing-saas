@@ -8,9 +8,13 @@ import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
+    Optional<CustomerEntity> findByCustomerId(String customerId);
+
     Optional<CustomerEntity> findByCustomerIdAndTenantId(String customerId, Long tenantId);
 
     List<CustomerEntity> findAllByTenantId(Long tenantId);
+
+    boolean existsByEmail(String email);
 
     boolean existsByEmailAndTenantId(String email, Long tenantId);
 

@@ -29,8 +29,18 @@ const Login = () => {
                 toast.success("Login successfull");
                 localStorage.setItem("token", response.data.token);
                 localStorage.setItem("role", response.data.role);
+                localStorage.setItem(
+                    "mustChangePassword",
+                    response.data.mustChangePassword ? "true" : "false"
+                );
                 setAuthData(response.data.token, response.data.role);
-                navigate("/dashboard");
+                if (response.data.mustChangePassword) {
+                    navigate("/change-password");
+                } else if (response.data.role === "SUPER_ADMIN") {
+                    navigate("/saas/tenants");
+                } else {
+                    navigate("/dashboard");
+                }
             }
         } catch (error) {
             console.error(error);
@@ -41,8 +51,8 @@ const Login = () => {
     }
 
     return (
-        <div className="bg-light d-flex align-items-center justify-content-center vh-100 login-background">
-            <div className="card shoadow-lg w-100" style={{maxWidth: '480px'}}>
+        <div className="d-flex align-items-center justify-content-center vh-100 login-background">
+            <div className="card w-100" style={{maxWidth: "480px"}}>
                 <div className="card-body">
                     <div className="text-center">
                         <h1 className="card-title">Sign in</h1>
@@ -65,7 +75,7 @@ const Login = () => {
                                 <input type="password" name="password" id="password" placeholder="**********" className="form-control" onChange={onChangeHandler} value={data.password} />
                             </div>
                             <div className="d-grid">
-                                <button type="sumbit" className="btn btn-dark btn-lg" disabled={loading}>
+                                <button type="submit" className="btn btn-warning btn-lg" disabled={loading}>
                                     {loading ? "Loading..." : "Sign in"}
                                 </button>
                             </div>

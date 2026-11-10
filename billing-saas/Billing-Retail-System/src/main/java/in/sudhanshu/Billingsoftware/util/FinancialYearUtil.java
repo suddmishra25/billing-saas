@@ -4,21 +4,22 @@ import java.time.LocalDate;
 
 public final class FinancialYearUtil {
 
-    private FinancialYearUtil() {
+    private FinancialYearUtil() {}
+
+    public static String currentFinancialYear() {
+        return financialYearFor(LocalDate.now());
     }
 
-    public static String getCurrentFinancialYear() {
-
-        LocalDate today = LocalDate.now();
-
-        int year = today.getYear();
-
-        if (today.getMonthValue() < 4) {
-            return (year - 1) + "-" +
-                    String.valueOf(year).substring(2);
+    /** Indian FY: April–March, label e.g. {@code 2025-26}. */
+    public static String financialYearFor(LocalDate date) {
+        if (date == null) {
+            return null;
         }
-
-        return year + "-" +
-                String.valueOf(year + 1).substring(2);
+        int year = date.getYear();
+        int month = date.getMonthValue();
+        if (month >= 4) {
+            return year + "-" + String.valueOf(year + 1).substring(2);
+        }
+        return (year - 1) + "-" + String.valueOf(year).substring(2);
     }
 }

@@ -5,6 +5,7 @@ import in.sudhanshu.Billingsoftware.entity.OrderItemEntity;
 import in.sudhanshu.Billingsoftware.io.*;
 import in.sudhanshu.Billingsoftware.repository.OrderEntityRepository;
 import in.sudhanshu.Billingsoftware.service.OrderService;
+import in.sudhanshu.Billingsoftware.util.PhoneNumberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderEntity convertToOrderEntity(OrderRequest request) {
         return OrderEntity.builder()
                 .customerName(request.getCustomerName())
-                .phoneNumber(request.getPhoneNumber())
+                .phoneNumber(PhoneNumberUtil.requireTenDigits(request.getPhoneNumber()))
                 .subtotal(request.getSubtotal())
                 .tax(request.getTax())
                 .grandTotal(request.getGrandTotal())

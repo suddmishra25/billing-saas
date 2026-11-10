@@ -1,8 +1,10 @@
 package in.sudhanshu.Billingsoftware.config;
 
 import in.sudhanshu.Billingsoftware.filter.JwtRequestFilter;
+import in.sudhanshu.Billingsoftware.filter.MustChangePasswordFilter;
 import in.sudhanshu.Billingsoftware.service.impl.AppUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -28,8 +31,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${app.cors.allowed-origins:http://localhost:5173}")
+    private String corsAllowedOrigins;
+
     private final AppUserDetailsService appUserDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
+    private final MustChangePasswordFilter mustChangePasswordFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -38,16 +45,24 @@ public class SecurityConfig {
         http
                 .cors(Customizer.withDefaults())
 
+                // Stateless JWT in Authorization header (not cookies) — browser CSRF against API is mitigated.
                 .csrf(AbstractHttpConfigurer::disable)
+
+                .headers(
+                        headers ->
+                                headers
+                                        .contentTypeOptions(Customizer.withDefaults())
+                                        .frameOptions(frame -> frame.deny()))
 
                 .authorizeHttpRequests(auth -> auth
 
                         // Public
                         .requestMatchers(
-                                "/api/v1.0/login"
+                                "/api/v1.0/login",
+                                "/uploads/**"
                         ).permitAll()
 
-                        // SaaS owner
+                        // SaaS owner (tenants + platform customers)
                         .requestMatchers(
                                 "/saas/**"
                         ).hasRole("SUPER_ADMIN")
@@ -63,12 +78,16 @@ public class SecurityConfig {
                                 "/api/v1.0/invoiceItems",
                                 "/api/v1.0/items/**",
                                 "/api/v1.0/invoices/**",
-                                "/customers",
-                                "/categories/**",
-                                "/items/**",
+                                "/api/v1.0/clients/**",
+                                "/api/v1.0/tenant/branding",
+                                "/api/v1.0/tenant/branding/**",
+                                "/api/v1.0/categories",
+                                "/api/v1.0/categories/**",
+                                "/api/v1.0/orders/**",
                                 "/orders/**",
                                 "/payments/**",
-                                "/dashboard/**"
+                                "/api/v1.0/dashboard",
+                                "/api/v1.0/dashboard/**"
                         ).hasAnyRole(
                                 "USER",
                                 "TENANT_ADMIN"
@@ -87,6 +106,10 @@ public class SecurityConfig {
                 .addFilterBefore(
                         jwtRequestFilter,
                         UsernamePasswordAuthenticationFilter.class
+                )
+                .addFilterAfter(
+                        mustChangePasswordFilter,
+                        JwtRequestFilter.class
                 );
 
         return http.build();
@@ -104,8 +127,10 @@ public class SecurityConfig {
                 new CorsConfiguration();
 
         config.setAllowedOrigins(
-                List.of("http://localhost:5173")
-        );
+                Arrays.stream(corsAllowedOrigins.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .toList());
 
         config.setAllowedMethods(
                 List.of(

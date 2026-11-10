@@ -6,3 +6,18 @@
     margin: 0;
     font-family: 'Outfit', sans-serif !important;
 }
+
+html {
+    overflow-y: scroll;
+}
+
+html,
+body,
+#root {
+    min-height: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+}

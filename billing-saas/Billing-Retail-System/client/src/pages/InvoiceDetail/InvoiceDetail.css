@@ -1,0 +1,548 @@
+.invoice-detail-container {
+    padding: 20px 20px 48px;
+    min-height: auto;
+    overflow-y: visible;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.invoice-detail-actions {
+    max-width: 210mm;
+    margin: 0 auto 16px;
+}
+
+.invoice-payment-panel {
+    max-width: 210mm;
+    margin: 0 auto 16px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 16px;
+    color: var(--app-text);
+    box-shadow: var(--app-shadow);
+}
+
+.invoice-paper {
+    max-width: 210mm;
+    margin: 0 auto;
+    background: #fff;
+    padding: 6mm 8mm 8mm;
+    color: #000;
+    font-size: 12px;
+    line-height: 1.3;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.invoice-paper,
+.invoice-paper table,
+.invoice-paper th,
+.invoice-paper td,
+.invoice-paper pre,
+.invoice-paper strong {
+    font-family: "Times New Roman", Times, serif;
+}
+
+/* —— Header: logo left, name centered on page (balanced 3-column grid) —— */
+.gst-invoice-header {
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #000;
+}
+
+.gst-invoice-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    margin: 0 0 8px;
+    text-transform: uppercase;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #111;
+}
+
+.gst-invoice-header-banner {
+    display: block;
+    width: 100%;
+    max-height: 140px;
+    object-fit: contain;
+    object-position: center top;
+    margin: 0 auto 6px;
+}
+
+.gst-brand-banner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px 0 4px;
+    min-height: 76px;
+}
+
+.gst-brand-banner--no-logo {
+    min-height: auto;
+}
+
+.gst-brand-side {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    line-height: 0;
+}
+
+.gst-invoice-logo {
+    width: 72px;
+    height: 72px;
+    max-width: 72px;
+    object-fit: contain;
+    border: none;
+    padding: 0;
+    background: transparent;
+    display: block;
+}
+
+.gst-brand-text {
+    text-align: center;
+    width: 100%;
+    padding: 0 8px;
+}
+
+.gst-brand-banner:not(.gst-brand-banner--no-logo) .gst-brand-text {
+    padding-left: 78px;
+    padding-right: 78px;
+    box-sizing: border-box;
+}
+
+.gst-invoice-company {
+    font-size: 32px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.12;
+    text-transform: none;
+    letter-spacing: 0.04em;
+    font-family: "Times New Roman", Times, serif;
+}
+
+.gst-invoice-company::after {
+    content: "";
+    display: block;
+    width: min(200px, 55%);
+    height: 2px;
+    margin: 5px auto 0;
+    background: currentColor;
+    opacity: 0.45;
+    border-radius: 1px;
+}
+
+.gst-invoice-tagline {
+    font-size: 11.5px;
+    font-weight: 700;
+    margin-top: 5px;
+    line-height: 1.35;
+    font-family: Arial, Helvetica, sans-serif;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.gst-invoice-contact {
+    text-align: center;
+    font-size: 10.5px;
+    margin: 6px 0 2px;
+    line-height: 1.45;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    color: #111;
+}
+
+.gst-invoice-contact-address {
+    margin-bottom: 3px;
+    max-width: 100%;
+    line-height: 1.35;
+}
+
+.gst-invoice-contact-line {
+    font-size: 11px;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.01em;
+}
+
+/* —— Main bordered sheet (single 1px outline, no doubled outer rules) —— */
+.gst-sheet {
+    border: 1px solid #000;
+}
+
+.gst-sheet table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.gst-sheet > table + table {
+    margin-top: -1px;
+}
+
+.gst-sheet td,
+.gst-sheet th {
+    border: 1px solid #000;
+    padding: 3px 5px;
+    vertical-align: top;
+}
+
+.gst-sheet > table tr > :first-child,
+.gst-sheet > table.gst-lines tr > :first-child {
+    border-left: none;
+}
+
+.gst-sheet > table tr > :last-child,
+.gst-sheet > table.gst-lines tr > :last-child {
+    border-right: none;
+}
+
+.gst-sheet > table:first-child tr:first-child > *,
+.gst-sheet > table.gst-lines:first-child tr:first-child > * {
+    border-top: none;
+}
+
+.gst-sheet > table + table tr:first-child > *,
+.gst-sheet > table + table.gst-lines thead tr:first-child > * {
+    border-top: none;
+}
+
+.gst-sheet > table:last-of-type tr:last-child > * {
+    border-bottom: none;
+}
+
+.gst-meta-left {
+    width: 50%;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.gst-meta-left strong {
+    font-size: 12px;
+}
+
+.gst-meta-right {
+    width: 50%;
+    padding: 0 !important;
+    vertical-align: top;
+}
+
+.gst-meta-right table {
+    height: 100%;
+    border-collapse: collapse;
+}
+
+.gst-meta-right > table td {
+    font-size: 11px;
+    padding: 2px 5px;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top: 1px solid #000;
+}
+
+.gst-meta-right > table tr:first-child td {
+    border-top: none;
+}
+
+.gst-meta-right > table td:first-child {
+    width: 48%;
+    font-weight: 400;
+    border-right: 1px solid #000;
+}
+
+.gst-section-label {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Line items — products & amounts at 14px, regular weight */
+.gst-lines th {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 5px 4px;
+}
+
+/* Open row body: vertical rules only, no horizontal lines between items / fillers */
+.gst-sheet table.gst-lines tbody tr:not(.summary) td {
+    border-top: none;
+    border-bottom: none;
+}
+
+.gst-sheet table.gst-lines thead th {
+    border-bottom: 1px solid #000;
+}
+
+.gst-sheet table.gst-lines tbody tr.summary td {
+    border-top: 1px solid #000;
+}
+
+.gst-lines tbody tr:not(.filler) td,
+.gst-lines tr.summary td {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.25;
+    padding: 4px 5px;
+}
+
+.gst-lines .col-sr {
+    width: 4%;
+}
+
+.gst-lines .col-hsn {
+    width: 11%;
+}
+
+.gst-lines .col-qty {
+    width: 9%;
+}
+
+.gst-lines .col-rate {
+    width: 13%;
+}
+
+.gst-lines .col-amt {
+    width: 13%;
+}
+
+.gst-lines .num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.gst-lines .center {
+    text-align: center;
+}
+
+.gst-lines .desc {
+    text-align: left;
+}
+
+.gst-lines .filler td {
+    height: 14px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.gst-lines .summary td {
+    font-weight: 400;
+}
+
+.gst-lines .summary-label {
+    text-align: right;
+    padding-right: 8px;
+}
+
+.gst-lines .grand-total td {
+    font-weight: 400;
+    font-size: 14px;
+}
+
+/* Amount in words row */
+.gst-words-row td {
+    border-top: 1px solid #000;
+    padding: 5px 6px;
+    font-size: 12px;
+}
+
+.gst-declaration {
+    border: none;
+    border-top: 1px solid #000;
+    margin-top: -1px;
+    padding: 5px 6px;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+/* Footer */
+.gst-footer-table td {
+    font-size: 10px;
+    vertical-align: top;
+}
+
+.gst-footer-terms {
+    width: 58%;
+    line-height: 1.35;
+}
+
+.gst-footer-terms pre {
+    margin: 4px 0 0;
+    font-family: inherit;
+    white-space: pre-wrap;
+    font-size: 10px;
+}
+
+.gst-footer-right {
+    width: 42%;
+}
+
+.gst-bank-title {
+    font-weight: 700;
+    text-decoration: underline;
+    margin-bottom: 4px;
+}
+
+.gst-bank-lines {
+    margin-bottom: 0;
+    line-height: 1.35;
+}
+
+.gst-footer-sign-row td {
+    border-top: 1px solid #000;
+    padding: 4px 6px;
+    vertical-align: top;
+    height: 76px;
+}
+
+.gst-sign-cell {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 68px;
+}
+
+.gst-sign-cell--auth {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.gst-sign-area {
+    flex: 1;
+    min-height: 36px;
+}
+
+.gst-sign-area--auth {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.gst-sign-area--auth img {
+    display: block;
+    max-height: 44px;
+    max-width: 130px;
+    object-fit: contain;
+}
+
+.gst-auth-for {
+    line-height: 1.3;
+}
+
+.gst-auth-label {
+    margin-top: auto;
+    line-height: 1.3;
+}
+
+.payment-status-badge {
+    font-size: 0.85rem;
+}
+
+.gst-invoice-footer-block {
+    border: 1px solid #000;
+    border-top: none;
+    margin-top: -1px;
+    background: #fff;
+}
+
+.gst-invoice-footer-block > table tr > :first-child {
+    border-left: none;
+}
+
+.gst-invoice-footer-block > table tr > :last-child {
+    border-right: none;
+}
+
+.gst-invoice-footer-block > table:first-child tr:first-child > * {
+    border-top: none;
+}
+
+.gst-invoice-footer-block > table:last-child tr:last-child > * {
+    border-bottom: none;
+}
+
+@media print {
+    @page {
+        size: A4;
+        margin: 8mm;
+    }
+
+    html,
+    body {
+        overflow: visible !important;
+        height: auto !important;
+        background: #fff !important;
+    }
+
+  body.print-invoice .app-shell {
+        min-height: auto;
+        display: block;
+    }
+
+    body.print-invoice .app-main {
+        display: block;
+    }
+
+    body:has(#gst-invoice-print) .invoice-detail-actions,
+    body:has(#gst-invoice-print) .invoice-payment-panel,
+    body:has(#gst-invoice-print) .navbar,
+    body:has(#gst-invoice-print) .app-footer,
+    body:has(#gst-invoice-print) .toast {
+        display: none !important;
+    }
+
+  body.print-invoice * {
+        visibility: hidden;
+    }
+
+    body.print-invoice #gst-invoice-print,
+    body.print-invoice #gst-invoice-print * {
+        visibility: visible;
+    }
+
+    body.print-invoice #gst-invoice-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+
+    .invoice-detail-container {
+        background: #fff;
+        padding: 0;
+    }
+
+    .invoice-paper {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    body.print-invoice .gst-invoice-footer-block {
+        position: static;
+        width: 100%;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    body.print-invoice .gst-sheet {
+        page-break-inside: auto;
+    }
+
+    .gst-declaration {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .gst-lines .filler td {
+        height: 13px;
+    }
+}

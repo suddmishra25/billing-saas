@@ -1,7 +1,12 @@
 package in.sudhanshu.Billingsoftware.controller;
 
+import in.sudhanshu.Billingsoftware.entity.UserEntity;
 import in.sudhanshu.Billingsoftware.io.AuthRequest;
 import in.sudhanshu.Billingsoftware.io.AuthResponse;
+import in.sudhanshu.Billingsoftware.io.ChangePasswordRequest;
+import in.sudhanshu.Billingsoftware.repository.UserRepository;
+import in.sudhanshu.Billingsoftware.security.CustomUserDetails;
+import in.sudhanshu.Billingsoftware.service.PasswordService;
 import in.sudhanshu.Billingsoftware.io.UserRequest;
 import in.sudhanshu.Billingsoftware.io.UserResponse;
 import in.sudhanshu.Billingsoftware.service.UserService;
@@ -16,6 +21,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -31,6 +37,8 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AppUserDetailsService appUserDetailsService;
     private final UserService userService;
+    private final PasswordService passwordService;
+    private final UserRepository userRepository;
 
     private final JwtUtil jwtUtil;
 
@@ -52,7 +60,26 @@ public class AuthController {
         final UserDetails userDetails = appUserDetailsService.loadUserByUsername(request.getEmail());
         final String jwtToken = jwtUtil.generateToken(userDetails);
         String role = userService.getUserRole(request.getEmail());
-        return new AuthResponse(request.getEmail(), jwtToken, role);
+        UserEntity user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+        boolean mustChange = Boolean.TRUE.equals(user.getMustChangePassword());
+        return new AuthResponse(request.getEmail(), jwtToken, role, mustChange);
+    }
+
+    @PostMapping("/auth/change-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void changePassword(
+            @AuthenticationPrincipal CustomUserDetails principal,
+            @RequestBody ChangePasswordRequest request) {
+
+        if (principal == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+        try {
+            passwordService.changePassword(principal.getEmail(), request);
+        } catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     private void authenticate(String email, String password) throws Exception {

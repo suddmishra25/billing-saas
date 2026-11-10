@@ -3,22 +3,37 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(
-        rgba(0, 0, 0, 0.4),
-        rgba(0, 0, 0, 0.4)
-    );
-    background-size: cover;
-    background-position: center;
+    padding: 1.5rem;
+    background: radial-gradient(ellipse 100% 80% at 50% -10%, rgba(34, 211, 238, 0.12), transparent 50%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(245, 158, 11, 0.1), transparent 45%),
+        linear-gradient(165deg, var(--app-bg-0), var(--app-bg-2));
 }
 
-.card {
-    background-color: white;
+.login-background .card {
+    background: var(--app-surface) !important;
     width: 100%;
-    max-width: 480px;
-    border: none;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    max-width: 440px;
+    border: 1px solid var(--app-border) !important;
+    box-shadow: var(--app-shadow), var(--app-shadow-glow);
+    border-radius: var(--app-radius-lg) !important;
+    color: var(--app-text);
 }
 
-.card-body {
+.login-background .card-body {
     padding: 2rem;
+}
+
+.login-background .card-title,
+.login-background h3,
+.login-background h4 {
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.login-background .form-control {
+    background: var(--app-bg-2) !important;
+}
+
+.login-background label {
+    color: var(--app-text-muted);
 }

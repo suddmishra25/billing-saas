@@ -1,0 +1,75 @@
+.create-invoice-container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    color: var(--app-text);
+}
+
+.create-invoice-title {
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    color: var(--app-primary);
+    border-bottom: 1px solid var(--app-border);
+    padding-bottom: 0.75rem;
+}
+
+.line-items-table {
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    overflow: hidden;
+}
+
+.line-items-table th {
+    font-weight: 600;
+    color: var(--app-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.create-invoice-section {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+    box-shadow: var(--app-shadow);
+}
+
+.create-invoice-branding-grid {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .create-invoice-branding-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.create-invoice-branding-main {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.create-invoice-branding-logo {
+    max-height: 56px;
+    max-width: 88px;
+    object-fit: contain;
+    background: #fff;
+    padding: 2px;
+    border-radius: 4px;
+}
+
+.create-invoice-branding-sign {
+    max-height: 48px;
+    max-width: 120px;
+    object-fit: contain;
+    background: #fff;
+    padding: 4px;
+    border-radius: 4px;
+}

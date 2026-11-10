@@ -20,13 +20,13 @@ public class InvoiceResponse {
     private LocalDate invoiceDate;
     private LocalDate dueDate;
 
-    // Customer
-    private String customerId;
-    private String customerName;
-    private String customerPhone;
-    private String customerEmail;
-    private String customerAddress;
-    private String customerGst;
+    // Client (bill-to)
+    private String clientId;
+    private String clientName;
+    private String clientPhone;
+    private String clientEmail;
+    private String clientAddress;
+    private String clientGst;
 
     // Seller
     private String sellerName;
@@ -65,8 +65,13 @@ public class InvoiceResponse {
     private String eWayBillNumber;
     private String purchaseOrderNumber;
     private String referenceNumber;
+    private String challanNumber;
+    private String challanDated;
     private String notes;
     private String tenantId;
+
+    /** Live tenant branding for print layout (logo, bank, terms). */
+    private TenantBrandingResponse branding;
 
     private List<InvoiceItemResponse> items;
 

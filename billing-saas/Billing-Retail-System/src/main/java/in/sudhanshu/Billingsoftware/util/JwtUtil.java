@@ -3,6 +3,7 @@ package in.sudhanshu.Billingsoftware.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,16 @@ public class JwtUtil {
     @Value("${jwt.secret.key}")
     private String SECRET_KEY;
 
+    @Value("${jwt.expiration:36000000}")
+    private long jwtExpirationMs;
+
+    @PostConstruct
+    void ensureSecretStrength() {
+        if (SECRET_KEY == null || SECRET_KEY.length() < 32) {
+            throw new IllegalStateException("jwt.secret.key must be at least 32 characters");
+        }
+    }
+
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claiams = new HashMap<>();
         return createToken(claiams, userDetails.getUsername());
@@ -28,7 +39,7 @@ public class JwtUtil {
                 .setClaims(claiams)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) //10 hours expiration
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }

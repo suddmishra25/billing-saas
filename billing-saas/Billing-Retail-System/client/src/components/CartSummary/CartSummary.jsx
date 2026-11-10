@@ -6,6 +6,7 @@ import {createOrder, deleteOrder} from "../../Services/OrderService.js";
 import toast from "react-hot-toast";
 import {createRazorpayOrder, verifyPayment} from "../../Services/PaymentService.js";
 import {AppConstants} from "../../util/constants.js";
+import {isValidPhone10, phoneValidationMessage} from "../../util/phone.js";
 
 const CartSummary = ({customerName, mobileNumber, setMobileNumber, setCustomerName}) => {
     const {cartItems, clearCart} = useContext(AppContext);
@@ -55,6 +56,10 @@ const CartSummary = ({customerName, mobileNumber, setMobileNumber, setCustomerNa
     const completePayment = async (paymentMode) => {
         if (!customerName || !mobileNumber) {
             toast.error("Please enter customer details");
+            return;
+        }
+        if (!isValidPhone10(mobileNumber) || mobileNumber.length !== 10) {
+            toast.error(phoneValidationMessage);
             return;
         }
 

@@ -1,0 +1,20 @@
+.clients-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 56px);
+    color: var(--app-text);
+}
+
+.clients-container .card {
+    box-shadow: var(--app-shadow);
+}
+
+@media (max-width: 992px) {
+    .clients-container {
+        grid-template-columns: 1fr;
+    }
+}

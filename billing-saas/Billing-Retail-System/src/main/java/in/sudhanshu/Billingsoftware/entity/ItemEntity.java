@@ -3,8 +3,6 @@ package in.sudhanshu.Billingsoftware.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -49,6 +47,10 @@ public class ItemEntity {
 
     private BigDecimal gstRate;
 
+    private BigDecimal cgstRate;
+
+    private BigDecimal sgstRate;
+
     private BigDecimal discount;
 
     private BigDecimal stockQuantity;
@@ -58,10 +60,9 @@ public class ItemEntity {
     @JoinColumn(name = "tenant_id", nullable = false)
     private TenantEntity tenant;
 
-    // Customer ownership
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private CustomerEntity customer;
+    @JoinColumn(name = "client_id", nullable = false)
+    private ClientEntity client;
 
     @CreationTimestamp
     @Column(updatable = false)

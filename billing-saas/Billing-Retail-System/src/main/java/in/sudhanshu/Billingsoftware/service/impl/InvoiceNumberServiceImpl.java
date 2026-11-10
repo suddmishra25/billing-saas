@@ -5,11 +5,10 @@ import in.sudhanshu.Billingsoftware.entity.TenantInvoiceSequence;
 import in.sudhanshu.Billingsoftware.repository.TenantInvoiceSequenceRepository;
 import in.sudhanshu.Billingsoftware.repository.TenantRepository;
 import in.sudhanshu.Billingsoftware.service.InvoiceNumberService;
+import in.sudhanshu.Billingsoftware.util.InvoiceNumberFormatUtil;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDate;
 
 @Service
 @AllArgsConstructor
@@ -28,20 +27,20 @@ public class InvoiceNumberServiceImpl implements InvoiceNumberService {
                                 new RuntimeException("Tenant not found")
                         );
 
-        String financialYear = getFinancialYear();
+        String sequenceKey = InvoiceNumberFormatUtil.sequenceBucket(tenant);
 
         TenantInvoiceSequence sequence =
                 sequenceRepository
                         .findForUpdate(
                                 tenantId,
-                                financialYear
+                                sequenceKey
                         )
                         .orElseGet(() -> {
 
                             TenantInvoiceSequence newSequence =
                                     TenantInvoiceSequence.builder()
                                             .tenant(tenant)
-                                            .financialYear(financialYear)
+                                            .financialYear(sequenceKey)
                                             .lastNumber(0L)
                                             .build();
 
@@ -56,22 +55,46 @@ public class InvoiceNumberServiceImpl implements InvoiceNumberService {
 
         sequenceRepository.save(sequence);
 
-        return "INV-" + financialYear + "-" + nextNumber;
+        return InvoiceNumberFormatUtil.format(tenant, nextNumber);
     }
 
-
-    private String getFinancialYear() {
-
-        LocalDate today = LocalDate.now();
-
-        int year = today.getYear();
-
-        int month = today.getMonthValue();
-
-        if (month >= 4) {
-            return year + "-" + String.valueOf(year + 1).substring(2);
-        } else {
-            return (year - 1) + "-" + String.valueOf(year).substring(2);
+    @Override
+    @Transactional
+    public void syncNextBillNumber(Long tenantId, long nextBillNumber) {
+        if (nextBillNumber < 1) {
+            throw new RuntimeException("Next bill number must be at least 1");
         }
+        TenantEntity tenant =
+                tenantRepository.findById(tenantId)
+                        .orElseThrow(() -> new RuntimeException("Tenant not found"));
+        String sequenceKey = InvoiceNumberFormatUtil.sequenceBucket(tenant);
+        long lastNumber = nextBillNumber - 1;
+
+        TenantInvoiceSequence sequence =
+                sequenceRepository
+                        .findByTenantIdAndFinancialYear(tenantId, sequenceKey)
+                        .orElseGet(
+                                () ->
+                                        TenantInvoiceSequence.builder()
+                                                .tenant(tenant)
+                                                .financialYear(sequenceKey)
+                                                .lastNumber(0L)
+                                                .build());
+
+        sequence.setLastNumber(lastNumber);
+        sequenceRepository.save(sequence);
+    }
+
+    @Override
+    @Transactional
+    public long resolveNextBillNumber(Long tenantId) {
+        TenantEntity tenant =
+                tenantRepository.findById(tenantId)
+                        .orElseThrow(() -> new RuntimeException("Tenant not found"));
+        String sequenceKey = InvoiceNumberFormatUtil.sequenceBucket(tenant);
+        return sequenceRepository
+                .findByTenantIdAndFinancialYear(tenantId, sequenceKey)
+                .map(s -> s.getLastNumber() + 1)
+                .orElse(1L);
     }
 }

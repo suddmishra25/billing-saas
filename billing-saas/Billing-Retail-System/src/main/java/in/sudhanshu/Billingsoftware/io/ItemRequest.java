@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ItemRequest {
 
-    private String customerId;
+    private String clientId;
 
     private String name;
 
@@ -25,6 +25,10 @@ public class ItemRequest {
     private BigDecimal purchasePrice;
 
     private BigDecimal gstRate;
+
+    private BigDecimal cgstRate;
+
+    private BigDecimal sgstRate;
 
     private BigDecimal discount;
 

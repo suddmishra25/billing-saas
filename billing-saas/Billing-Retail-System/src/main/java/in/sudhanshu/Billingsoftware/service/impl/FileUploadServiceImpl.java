@@ -1,6 +1,7 @@
 package in.sudhanshu.Billingsoftware.service.impl;
 
 import in.sudhanshu.Billingsoftware.service.FileUploadService;
+import in.sudhanshu.Billingsoftware.util.SecureUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -26,8 +27,9 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Override
     public String uploadFile(MultipartFile file) {
-        String filenameExtension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf(".")+1);
-        String key = UUID.randomUUID().toString()+"."+filenameExtension;
+        SecureUploadUtil.validateImageUpload(file);
+        String ext = SecureUploadUtil.safeExtension(file.getOriginalFilename());
+        String key = UUID.randomUUID() + ext;
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

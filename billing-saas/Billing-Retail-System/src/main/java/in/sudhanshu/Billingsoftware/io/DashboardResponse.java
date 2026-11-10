@@ -1,5 +1,6 @@
 package in.sudhanshu.Billingsoftware.io;
 
+import in.sudhanshu.Billingsoftware.dto.InvoiceResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,10 @@ import java.util.List;
 @NoArgsConstructor
 public class DashboardResponse {
 
-    private Double todaySales;
-    private Long todayOrderCount;
-    private List<OrderResponse> recentOrders;
+    private Double monthSales;
+    private Long monthInvoiceCount;
+    private List<InvoiceResponse> recentInvoices;
+    private int currentPage;
+    private int totalPages;
+    private long totalElements;
 }

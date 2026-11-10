@@ -55,12 +55,12 @@ public class InvoiceEntity {
     private TenantEntity tenant;
 
     // =========================
-    // Customer
+    // Client (invoice bill-to party)
     // =========================
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private CustomerEntity customer;
+    @JoinColumn(name = "client_id", nullable = false)
+    private ClientEntity client;
 
     // =========================
     // Seller snapshot
@@ -115,6 +115,11 @@ public class InvoiceEntity {
     private String eWayBillNumber;
     private String purchaseOrderNumber;
     private String referenceNumber;
+
+    private String challanNumber;
+
+    /** Challan date(s), e.g. 15-09-2026 or comma-separated */
+    private String challanDated;
 
     @Column(length = 1000)
     private String notes;

@@ -2,18 +2,20 @@ package in.sudhanshu.Billingsoftware.service;
 
 import in.sudhanshu.Billingsoftware.io.ItemRequest;
 import in.sudhanshu.Billingsoftware.io.ItemResponse;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 public interface ItemService {
 
     ItemResponse createItem(ItemRequest request);
 
-    List<ItemResponse> getCustomerItems(String customerId);
+    ItemResponse updateItem(String itemId, String clientId, ItemRequest request);
 
-    ItemResponse getItem(String itemId, String customerId);
+    List<ItemResponse> getClientItems(String clientId);
 
-    void deleteItem(String itemId, String customerId);
+    ItemResponse getItem(String itemId, String clientId);
+
+    void deleteItem(String itemId, String clientId);
+
+    List<ItemResponse> read();
 }

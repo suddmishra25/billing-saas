@@ -7,16 +7,15 @@ import in.sudhanshu.Billingsoftware.repository.CategoryRepository;
 import in.sudhanshu.Billingsoftware.repository.ItemRepository;
 import in.sudhanshu.Billingsoftware.service.CategoryService;
 import in.sudhanshu.Billingsoftware.service.FileUploadService;
+import in.sudhanshu.Billingsoftware.util.SecureUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -31,12 +30,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     public CategoryResponse add(CategoryRequest request, MultipartFile file) throws IOException {
         //String imgUrl = fileUploadService.uploadFile(file);
-        String fileName = UUID.randomUUID().toString()+"."+StringUtils.getFilenameExtension(file.getOriginalFilename());
+        String ext = SecureUploadUtil.safeExtension(file.getOriginalFilename());
+        String fileName = SecureUploadUtil.newStoredFileName("category", ext);
         Path uploadPath = Paths.get("uploads").toAbsolutePath().normalize();
-        Files.createDirectories(uploadPath);
-        Path targetLocation = uploadPath.resolve(fileName);
-        Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
-        String imgUrl = "http://localhost:8080/api/v1.0/uploads/"+fileName;
+        SecureUploadUtil.writeUpload(uploadPath, file, fileName);
+        String imgUrl = "http://localhost:8080/uploads/" + fileName;
         CategoryEntity newCategory = convertToEntity(request);
         newCategory.setImgUrl(imgUrl);
         newCategory = categoryRepository.save(newCategory);
@@ -57,10 +55,10 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new RuntimeException("Category not found: "+categoryId));
         //fileUploadService.deleteFile(existingCategory.getImgUrl());
         String imgUrl = existingCategory.getImgUrl();
-        String fileName = imgUrl.substring(imgUrl.lastIndexOf("/")+1);
+        String fileName = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
         Path uploadPath = Paths.get("uploads").toAbsolutePath().normalize();
-        Path filePath = uploadPath.resolve(fileName);
         try {
+            Path filePath = SecureUploadUtil.resolveUnderRoot(uploadPath, fileName);
             Files.deleteIfExists(filePath);
         } catch (IOException e) {
             e.printStackTrace();

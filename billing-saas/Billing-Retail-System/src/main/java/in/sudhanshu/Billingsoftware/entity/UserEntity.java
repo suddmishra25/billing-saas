@@ -36,6 +36,10 @@ public class UserEntity {
 
     private String name;
 
+    /** True when user must set a new password (e.g. after super-admin default password). */
+    @Builder.Default
+    private Boolean mustChangePassword = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tenant_id")
     private TenantEntity tenant;

@@ -8,25 +8,19 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
-    Optional<ItemEntity> findByItemIdAndTenantIdAndCustomerCustomerId(
+    Optional<ItemEntity> findByItemIdAndTenantIdAndClientClientId(
             String itemId,
             Long tenantId,
-            String customerId
+            String clientId
     );
 
-    List<ItemEntity> findByTenantIdAndCustomerCustomerId(
-            Long tenantId,
-            String customerId
-    );
+    List<ItemEntity> findByTenantIdAndClientClientId(Long tenantId, String clientId);
 
-    Optional<ItemEntity> findByItemIdAndTenantId(
-            String itemId,
-            Long tenantId
-    );
+    List<ItemEntity> findByTenantId(Long tenantId);
 
-    Optional<ItemEntity> findByItemIdAndTenantIdAndCustomerId(
+    Optional<ItemEntity> findByItemIdAndTenantIdAndClientId(
             String itemId,
             Long tenantId,
-            Long customerId
+            Long clientId
     );
 }
