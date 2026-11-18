@@ -84,7 +84,7 @@
 
 .gst-brand-side {
     position: absolute;
-    left: 0;
+    left: 50px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;

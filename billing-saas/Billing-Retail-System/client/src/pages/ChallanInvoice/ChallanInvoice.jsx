@@ -11,6 +11,7 @@ import {
     parseChallanText,
     parseChallanTextsPickBest,
     resolveClientFromHint,
+    suggestChallanLineHints,
 } from "../../util/challanParse.js";
 import {assets} from "../../assets/assets.js";
 
@@ -73,6 +74,15 @@ const ChallanInvoice = () => {
     }, [clients, clientNameHint, clientId]);
 
     useEffect(() => {
+        if (!clientId || !catalogItems.length || !parsedHints.length) return;
+        const remapped = mapHintsToInvoiceLines(parsedHints, catalogItems);
+        const matched = remapped.some((r) => r.matched);
+        if (matched) {
+            setLines(remapped);
+        }
+    }, [clientId, catalogItems, parsedHints]);
+
+    useEffect(() => {
         if (!parsedHints.length) return;
         setLines((prev) => {
             const mapped = mapHintsToInvoiceLines(parsedHints, catalogItems);
@@ -90,28 +100,36 @@ const ChallanInvoice = () => {
         setChallanNumber(parsed.challanNumber || "");
         setChallanDated(parsed.challanDated || "");
         setClientNameHint(parsed.clientHint || "");
-        setParsedHints(parsed.lineHints || []);
+        let hints = parsed.lineHints || [];
+        const anyInferred = hints.some((h) => h.ocrMissing);
+        setParsedHints(hints);
         setOcrText(parsed.rawText || "");
         setParseSummary({
             client: parsed.clientHint || null,
             challanNumber: parsed.challanNumber || null,
             challanDated: parsed.challanDated || null,
-            productCount: parsed.lineHints?.length || 0,
+            productCount: hints.length || 0,
+            lineItemsInferred: anyInferred,
         });
         const client = resolveClientFromHint(parsed.clientHint, clients);
         if (client) setClientId(client.clientId);
 
-        setLines(mapHintsToInvoiceLines(parsed.lineHints || [], catalogItems));
+        setLines(mapHintsToInvoiceLines(hints, catalogItems));
         setPhase("review");
 
         const missing = [];
         if (!parsed.clientHint) missing.push("client (Customer M/s)");
         if (!parsed.challanNumber) missing.push("challan no.");
         if (!parsed.challanDated) missing.push("challan date");
-        if (!parsed.lineHints?.length) missing.push("product / quantity");
+        if (!hints.length) missing.push("product / quantity");
 
         if (missing.length === 4) {
             toast.error("Could not read the challan — edit fields below or paste text");
+        } else if (anyInferred) {
+            toast(
+                "Description/qty not in scan (stamp/handwriting) — suggested line added; match product & fix qty",
+                {icon: "ℹ️", duration: 6000}
+            );
         } else if (missing.length) {
             toast(`Read partially — check: ${missing.join(", ")}`, {icon: "⚠️"});
         } else {
@@ -335,8 +353,21 @@ const ChallanInvoice = () => {
                                 <li className={parseSummary.challanDated ? "text-success" : "text-danger"}>
                                     Challan date: {parseSummary.challanDated || "—"}
                                 </li>
-                                <li className={parseSummary.productCount ? "text-success" : "text-danger"}>
-                                    Products: {parseSummary.productCount || "none"}
+                                <li
+                                    className={
+                                        parseSummary.productCount
+                                            ? parseSummary.lineItemsInferred
+                                                ? "text-warning"
+                                                : "text-success"
+                                            : "text-danger"
+                                    }
+                                >
+                                    Products:{" "}
+                                    {parseSummary.productCount
+                                        ? parseSummary.lineItemsInferred
+                                            ? `${parseSummary.productCount} (suggested — verify qty)`
+                                            : parseSummary.productCount
+                                        : "none"}
                                 </li>
                             </ul>
                         </div>
@@ -392,6 +423,12 @@ const ChallanInvoice = () => {
                     {clientId && catalogItems.length === 0 && (
                         <p className="text-warning small">
                             No products for this client — add them under Products first.
+                        </p>
+                    )}
+                    {parseSummary?.lineItemsInferred && lines.length > 0 && (
+                        <p className="small text-warning mb-2">
+                            Handwritten line items were not readable in OCR (blue ink / stamp). Pick the
+                            catalogue product and enter qty from the paper (e.g. 60 or 600).
                         </p>
                     )}
                     {lines.length > 0 && (
@@ -492,9 +529,6 @@ const ChallanInvoice = () => {
                 </button>
                 <Link to="/invoices/new" className="btn btn-secondary">
                     Manual form
-                </Link>
-                <Link to="/invoices/voice" className="btn btn-secondary">
-                    Voice invoice
                 </Link>
             </div>
         </div>

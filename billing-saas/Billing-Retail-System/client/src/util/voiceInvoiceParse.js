@@ -72,6 +72,12 @@ export const matchItem = (phrase, catalogItems) => {
         const words = name.split(" ").filter((w) => w.length > 3);
         if (words.some((w) => p.includes(w))) return it;
     }
+    if (/rubb|l\s*rub|pad/i.test(p)) {
+        for (const it of catalogItems) {
+            const name = normalize(it.name);
+            if (/rubb/i.test(name)) return it;
+        }
+    }
     return null;
 };
 

@@ -111,7 +111,6 @@ const Menubar = () => {
                                     className={`nav-link ${
                                         location.pathname === "/invoices" ||
                                         (location.pathname.startsWith("/invoices/") &&
-                                            location.pathname !== "/invoices/voice" &&
                                             location.pathname !== "/invoices/challan" &&
                                             !location.pathname.startsWith("/invoices/new"))
                                             ? "fw-bold text-warning"
@@ -122,18 +121,6 @@ const Menubar = () => {
                                     Invoices
                                 </Link>
                             </li>
-                            {isTenantStaff && (
-                                <li className="nav-item">
-                                    <Link
-                                        className={`nav-link ${
-                                            isActive("/invoices/voice") ? "fw-bold text-warning" : ""
-                                        }`}
-                                        to="/invoices/voice"
-                                    >
-                                        Voice invoice
-                                    </Link>
-                                </li>
-                            )}
                             {isTenantStaff && (
                                 <li className="nav-item">
                                     <Link

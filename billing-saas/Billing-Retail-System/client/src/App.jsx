@@ -13,7 +13,6 @@ import ManageClients from "./pages/ManageClients/ManageClients.jsx";
 import InvoiceDetail from "./pages/InvoiceDetail/InvoiceDetail.jsx";
 import InvoiceHistory from "./pages/InvoiceHistory/InvoiceHistory.jsx";
 import SalesReports from "./pages/SalesReports/SalesReports.jsx";
-import VoiceInvoice from "./pages/VoiceInvoice/VoiceInvoice.jsx";
 import ChallanInvoice from "./pages/ChallanInvoice/ChallanInvoice.jsx";
 import InvoiceBranding from "./pages/InvoiceBranding/InvoiceBranding.jsx";
 import {useContext} from "react";
@@ -135,7 +134,6 @@ const App = () => {
                     }
                 />
                 <Route path="/invoices/new" element={<TenantAppRoute element={<CreateInvoice />} />} />
-                <Route path="/invoices/voice" element={<TenantAppRoute element={<VoiceInvoice />} />} />
                 <Route path="/invoices/challan" element={<TenantAppRoute element={<ChallanInvoice />} />} />
                 <Route path="/invoices/:invoiceId/edit" element={<TenantAppRoute element={<CreateInvoice />} />} />
                 <Route path="/invoices" element={<TenantAppRoute element={<InvoiceHistory />} />} />

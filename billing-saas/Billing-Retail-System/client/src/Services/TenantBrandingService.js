@@ -17,6 +17,14 @@ export const uploadTenantHeader = async (file) => {
     });
 };
 
+export const uploadTenantHeaderBanner = async (file) => {
+    const form = new FormData();
+    form.append("file", file);
+    return await axios.post(`${API_BASE}/tenant/branding/header-banner`, form, {
+        headers: authHeaders(),
+    });
+};
+
 export const uploadTenantSignature = async (file) => {
     const form = new FormData();
     form.append("file", file);

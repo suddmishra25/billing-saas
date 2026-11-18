@@ -7,6 +7,7 @@ import {
     fetchTenantBranding,
     updateTenantBranding,
     uploadTenantHeader,
+    uploadTenantHeaderBanner,
     uploadTenantSignature,
 } from "../../Services/TenantBrandingService.js";
 import {formatBillNumberPreview} from "../../util/invoiceBillPreview.js";
@@ -33,6 +34,7 @@ const emptyForm = {
     companyNameColor: "#CC0000",
     taglineColor: "#CC0000",
     headerImageUrl: "",
+    headerBannerUrl: "",
     signatureImageUrl: "",
     bankName: "",
     bankAccountNumber: "",
@@ -104,6 +106,31 @@ const InvoiceBranding = () => {
         }
     };
 
+    const onHeaderBannerFile = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+            const res = await uploadTenantHeaderBanner(file);
+            setForm((prev) => ({...prev, headerBannerUrl: res.data.url}));
+            toast.success("Full header banner uploaded — used on tax invoices");
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.message || "Banner upload failed");
+        }
+        e.target.value = "";
+    };
+
+    const onClearHeaderBanner = async () => {
+        try {
+            const res = await updateTenantBranding({...form, headerBannerUrl: ""});
+            setForm({...emptyForm, ...res.data});
+            toast.success("Header banner removed — logo and name layout restored");
+        } catch (err) {
+            console.error(err);
+            toast.error("Could not remove banner");
+        }
+    };
+
     const onHeaderFile = async (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -115,6 +142,7 @@ const InvoiceBranding = () => {
             console.error(err);
             toast.error("Header upload failed");
         }
+        e.target.value = "";
     };
 
     const onSignatureFile = async (e) => {
@@ -286,7 +314,32 @@ const InvoiceBranding = () => {
                     </div>
 
                     <hr className="border-secondary my-4" />
-                    <h6 className="text-warning">Header logo / banner</h6>
+                    <h6 className="text-warning">Invoice header</h6>
+                    <label className="form-label">Full-width invoice header banner (optional)</label>
+                    <p className="small text-white-50 mb-2">
+                        If uploaded, the tax invoice shows this image instead of the logo, company name, and address
+                        block. Remove the banner to use the built-in header.
+                    </p>
+                    <div className="mb-4">
+                        <input type="file" accept="image/*" className="form-control" onChange={onHeaderBannerFile} />
+                        {form.headerBannerUrl && (
+                            <div className="mt-2">
+                                <img
+                                    src={form.headerBannerUrl}
+                                    alt="Invoice header banner"
+                                    className="invoice-branding-preview invoice-branding-banner-preview"
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-outline-danger btn-sm mt-2"
+                                    onClick={onClearHeaderBanner}
+                                >
+                                    Remove banner
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                    <label className="form-label">Header logo (built-in layout)</label>
                     <div className="mb-3">
                         <input type="file" accept="image/*" className="form-control" onChange={onHeaderFile} />
                         {form.headerImageUrl && (

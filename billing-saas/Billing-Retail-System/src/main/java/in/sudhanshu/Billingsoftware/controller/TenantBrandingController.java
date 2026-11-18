@@ -34,6 +34,12 @@ public class TenantBrandingController {
         return Map.of("url", url);
     }
 
+    @PostMapping(value = "/header-banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Map<String, String> uploadHeaderBanner(@RequestPart("file") MultipartFile file) throws IOException {
+        String url = tenantBrandingService.uploadHeaderBannerImage(file);
+        return Map.of("url", url);
+    }
+
     @PostMapping(value = "/signature", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, String> uploadSignature(@RequestPart("file") MultipartFile file) throws IOException {
         String url = tenantBrandingService.uploadSignatureImage(file);

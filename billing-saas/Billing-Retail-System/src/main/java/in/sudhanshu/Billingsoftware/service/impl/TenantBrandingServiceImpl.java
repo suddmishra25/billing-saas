@@ -90,6 +90,15 @@ public class TenantBrandingServiceImpl implements TenantBrandingService {
     }
 
     @Override
+    public String uploadHeaderBannerImage(MultipartFile file) throws IOException {
+        String url = saveUpload(file, "tenant-header-banner");
+        TenantEntity tenant = currentTenant();
+        tenant.setHeaderBannerUrl(url);
+        tenantRepository.save(tenant);
+        return url;
+    }
+
+    @Override
     public String uploadSignatureImage(MultipartFile file) throws IOException {
         String url = saveUpload(file, "tenant-signature");
         TenantEntity tenant = currentTenant();

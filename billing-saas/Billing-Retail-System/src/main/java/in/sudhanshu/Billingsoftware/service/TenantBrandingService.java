@@ -14,6 +14,8 @@ public interface TenantBrandingService {
 
     String uploadHeaderImage(MultipartFile file) throws IOException;
 
+    String uploadHeaderBannerImage(MultipartFile file) throws IOException;
+
     String uploadSignatureImage(MultipartFile file) throws IOException;
 
     String uploadHeaderImageForTenant(String tenantId, MultipartFile file) throws IOException;
