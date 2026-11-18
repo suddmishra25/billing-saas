@@ -1,5 +1,60 @@
 # Deploy: Vercel (frontend) + Render (backend + PostgreSQL)
 
+## Monorepo (one Git repo, two deploys)
+
+Keep **one** GitHub repository; host **frontend** and **backend** as separate services. Each platform only builds its subfolder.
+
+```
+your-github-repo/                    ← single clone, single history
+└── billing-saas/
+    └── Billing-Retail-System/       ← Render Root Directory
+        ├── Dockerfile               ← API image (Render)
+        ├── pom.xml, src/            ← Spring Boot
+        └── client/                  ← Vercel Root Directory
+            ├── package.json
+            ├── vercel.json
+            └── src/
+```
+
+| Host | What it deploys | Root Directory in dashboard |
+|------|-----------------|----------------------------|
+| **Render** | Spring API + (optional) Postgres | `billing-saas/Billing-Retail-System` |
+| **Vercel** | React static site | `billing-saas/Billing-Retail-System/client` |
+
+**Why this works**
+
+- Pushes to `main` can update both services; each host runs **only** its build (Maven/Docker vs `npm run build`).
+- Frontend talks to backend via **`VITE_API_ORIGIN`** (Vercel env) → public Render URL. No code in the same process; CORS links the two origins.
+- You do **not** need two Git repos or a monolith deploy.
+
+**Optional — fewer Vercel builds**
+
+Vercel → Project → Settings → **Git** → **Ignored Build Step**: only build when `client/` changes, e.g.:
+
+```bash
+git diff HEAD^ HEAD --quiet -- client/
+```
+
+(instructions in Vercel docs; path is relative to the Vercel root, i.e. `client/` if root is already `.../client`, use `.` or skip this step)
+
+**Optional — Render only on backend changes**
+
+Render → Service → **Settings** → **Build & Deploy** → set **Auto-Deploy** + filter via [Render monorepo support](https://render.com/docs/monorepo-support) (Root Directory already scopes the build context).
+
+**Local dev (unchanged)**
+
+```bash
+# Terminal 1 — API
+cd billing-saas/Billing-Retail-System
+./mvnw spring-boot:run
+
+# Terminal 2 — UI
+cd billing-saas/Billing-Retail-System/client
+npm run dev
+```
+
+---
+
 ## Architecture
 
 | Piece | Host | URL example |
