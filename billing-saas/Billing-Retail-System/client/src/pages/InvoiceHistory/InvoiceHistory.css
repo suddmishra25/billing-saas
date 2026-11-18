@@ -1,0 +1,56 @@
+.invoice-history-container {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: calc(100vh - 5rem);
+    box-sizing: border-box;
+}
+
+.invoice-history-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 1.25rem;
+}
+
+.invoice-history-header h2 {
+    color: var(--app-primary);
+    font-weight: 700;
+    margin: 0;
+}
+
+.invoice-history-table-wrap {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    padding: 1rem;
+    box-shadow: var(--app-shadow);
+    overflow-x: auto;
+}
+
+.table th {
+    font-weight: 600;
+    color: var(--app-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-color: var(--app-border) !important;
+}
+
+.table td {
+    vertical-align: middle;
+    border-color: var(--app-border) !important;
+}
+
+.invoice-link {
+    color: var(--app-primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.invoice-link:hover {
+    color: var(--app-primary-hover);
+    text-decoration: underline;
+}

@@ -1,0 +1,112 @@
+.sales-reports-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.25rem 2rem;
+}
+
+.sales-reports-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.sales-reports-header h2 {
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.sales-reports-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+}
+
+.sales-reports-filters label {
+    font-size: 0.75rem;
+    color: var(--app-text-muted);
+    margin-bottom: 0.25rem;
+}
+
+.sales-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.sales-summary-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius);
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s;
+}
+
+.sales-summary-card:hover {
+    border-color: var(--app-border-bright);
+}
+
+.sales-summary-card .label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--app-text-muted);
+}
+
+.sales-summary-card .value {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--app-primary);
+}
+
+.sales-reports-section {
+    margin-bottom: 1.75rem;
+}
+
+.sales-reports-section h5 {
+    color: var(--app-primary);
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.sales-reports-table-wrap {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    border-radius: var(--app-radius-lg);
+    padding: 0.5rem;
+    overflow-x: auto;
+    box-shadow: var(--app-shadow);
+}
+
+.sales-reports-table {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+
+.sales-reports-table th {
+    white-space: nowrap;
+    color: var(--app-text-muted);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+}
+
+.client-row-clickable {
+    cursor: pointer;
+}
+
+.client-row-clickable:hover {
+    background: var(--app-primary-soft) !important;
+}
+
+.client-row-active {
+    background: var(--app-accent-soft) !important;
+}

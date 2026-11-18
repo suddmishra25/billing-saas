@@ -1,0 +1,14 @@
+# IntelliJ
+.idea/
+*.iml
+
+# Maven
+target/
+
+# Spring Boot configuration
+**/application.properties
+**/application-*.properties
+
+# Local architecture notes (not tracked)
+CODEBASE.md
+

@@ -1,0 +1,39 @@
+.login-background {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: radial-gradient(ellipse 100% 80% at 50% -10%, rgba(34, 211, 238, 0.12), transparent 50%),
+        radial-gradient(ellipse 60% 50% at 100% 100%, rgba(245, 158, 11, 0.1), transparent 45%),
+        linear-gradient(165deg, var(--app-bg-0), var(--app-bg-2));
+}
+
+.login-background .card {
+    background: var(--app-surface) !important;
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid var(--app-border) !important;
+    box-shadow: var(--app-shadow), var(--app-shadow-glow);
+    border-radius: var(--app-radius-lg) !important;
+    color: var(--app-text);
+}
+
+.login-background .card-body {
+    padding: 2rem;
+}
+
+.login-background .card-title,
+.login-background h3,
+.login-background h4 {
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.login-background .form-control {
+    background: var(--app-bg-2) !important;
+}
+
+.login-background label {
+    color: var(--app-text-muted);
+}

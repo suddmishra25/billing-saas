@@ -1,0 +1,31 @@
+.manage-tenants-page {
+    min-height: calc(100vh - 120px);
+    padding: 1.5rem;
+    color: var(--app-text);
+}
+
+.manage-tenants-card {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.manage-tenants-card > .d-flex h4 {
+    color: var(--app-primary);
+    font-weight: 700;
+}
+
+.tenant-branding-preview {
+    max-height: 72px;
+    max-width: 200px;
+    object-fit: contain;
+    background: #fff;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.tenant-banner-preview {
+    max-width: 100%;
+    max-height: 120px;
+    width: auto;
+    display: block;
+}

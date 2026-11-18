@@ -1,0 +1,5 @@
+/* Nav specifics — global tokens in styles/theme.css */
+
+.navbar-brand {
+    font-weight: 700;
+}
