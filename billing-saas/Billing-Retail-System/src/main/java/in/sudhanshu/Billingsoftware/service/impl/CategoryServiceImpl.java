@@ -9,6 +9,7 @@ import in.sudhanshu.Billingsoftware.service.CategoryService;
 import in.sudhanshu.Billingsoftware.service.FileUploadService;
 import in.sudhanshu.Billingsoftware.util.SecureUploadUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +25,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
 
+    @Value("${app.public.base-url:http://localhost:8080}")
+    private String publicBaseUrl;
+
     private final CategoryRepository categoryRepository;
     private final FileUploadService fileUploadService;
     private final ItemRepository itemRepository;
@@ -34,7 +38,8 @@ public class CategoryServiceImpl implements CategoryService {
         String fileName = SecureUploadUtil.newStoredFileName("category", ext);
         Path uploadPath = Paths.get("uploads").toAbsolutePath().normalize();
         SecureUploadUtil.writeUpload(uploadPath, file, fileName);
-        String imgUrl = "http://localhost:8080/uploads/" + fileName;
+        String base = publicBaseUrl.replaceAll("/$", "");
+        String imgUrl = base + "/uploads/" + fileName;
         CategoryEntity newCategory = convertToEntity(request);
         newCategory.setImgUrl(imgUrl);
         newCategory = categoryRepository.save(newCategory);

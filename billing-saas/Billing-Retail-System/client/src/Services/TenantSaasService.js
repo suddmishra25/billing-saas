@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const SAAS_BASE = "http://localhost:8080/saas";
+import {SAAS_BASE} from "../util/api.js";
 
 const saasHeaders = () => ({
     Authorization: `Bearer ${localStorage.getItem("token")}`,

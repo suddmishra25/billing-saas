@@ -1,13 +1,14 @@
 import axios from "axios";
+import {API_BASE, authHeaders} from "../util/api.js";
 
 export const addCategory = async (category) => {
-    return await axios.post('http://localhost:8080/api/v1.0/admin/categories', category, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
-}
+    return await axios.post(`${API_BASE}/admin/categories`, category, {headers: authHeaders()});
+};
 
 export const deleteCategory = async (categoryId) => {
-    return await axios.delete(`http://localhost:8080/api/v1.0/admin/categories/${categoryId}`, {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
-}
+    return await axios.delete(`${API_BASE}/admin/categories/${categoryId}`, {headers: authHeaders()});
+};
 
 export const fetchCategories = async () => {
-    return await axios.get('http://localhost:8080/api/v1.0/categories', {headers: {'Authorization': `Bearer ${localStorage.getItem('token')}`}});
-}
+    return await axios.get(`${API_BASE}/categories`, {headers: authHeaders()});
+};

@@ -12,6 +12,7 @@ import in.sudhanshu.Billingsoftware.util.SecureUploadUtil;
 import in.sudhanshu.Billingsoftware.util.InvoiceNumberFormatUtil;
 import in.sudhanshu.Billingsoftware.util.TenantContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TenantBrandingServiceImpl implements TenantBrandingService {
 
-    private static final String UPLOAD_PUBLIC_BASE = "http://localhost:8080/uploads/";
+    @Value("${app.public.base-url:http://localhost:8080}")
+    private String publicBaseUrl;
 
     private final TenantRepository tenantRepository;
     private final InvoiceNumberService invoiceNumberService;
@@ -151,7 +153,8 @@ public class TenantBrandingServiceImpl implements TenantBrandingService {
         String fileName = SecureUploadUtil.newStoredFileName(prefix, ext);
         Path uploadPath = Paths.get("uploads").toAbsolutePath().normalize();
         SecureUploadUtil.writeUpload(uploadPath, file, fileName);
-        return UPLOAD_PUBLIC_BASE + fileName;
+        String base = publicBaseUrl.replaceAll("/$", "");
+        return base + "/uploads/" + fileName;
     }
 
     private TenantBrandingResponse toResponse(TenantEntity tenant) {

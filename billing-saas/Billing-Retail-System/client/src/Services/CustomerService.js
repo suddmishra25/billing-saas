@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const SAAS_BASE = "http://localhost:8080/saas";
+import {SAAS_BASE} from "../util/api.js";
 
 export const fetchCustomers = async () => {
     return await axios.get(`${SAAS_BASE}/customers`, {
